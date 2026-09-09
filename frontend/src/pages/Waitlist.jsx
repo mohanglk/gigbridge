@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 function MusicianIcon() {
   return (
     <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -45,6 +47,8 @@ function VenueIcon() {
 }
 
 export default function Waitlist() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-ink flex flex-col items-center justify-center px-6">
       <h2 className="font-display text-[36px] md:text-[52px] text-paper mb-12 tracking-wide">
@@ -53,14 +57,20 @@ export default function Waitlist() {
 
       <div className="flex flex-col sm:flex-row gap-8">
         {/* Musician box */}
-        <button className="bg-[#e5e7eb] text-ink w-64 h-64 flex flex-col items-center justify-center gap-4 rounded-sm shadow-stamp hover:scale-105 transition-transform cursor-pointer">
+        <button
+          onClick={() => navigate("/register?type=musician")}
+          className="bg-[#e5e7eb] text-ink w-64 h-64 flex flex-col items-center justify-center gap-4 rounded-sm shadow-stamp hover:scale-105 transition-transform cursor-pointer"
+        >
           <MusicianIcon />
           <span className="font-display text-[28px] tracking-wide">MUSICIAN</span>
           <span className="text-[13px] text-ink-soft font-medium">I perform &amp; play</span>
         </button>
 
         {/* Venue box */}
-        <button className="bg-[#e5e7eb] text-ink w-64 h-64 flex flex-col items-center justify-center gap-4 rounded-sm shadow-stamp hover:scale-105 transition-transform cursor-pointer">
+        <button
+          onClick={() => navigate("/register?type=venue")}
+          className="bg-[#e5e7eb] text-ink w-64 h-64 flex flex-col items-center justify-center gap-4 rounded-sm shadow-stamp hover:scale-105 transition-transform cursor-pointer"
+        >
           <VenueIcon />
           <span className="font-display text-[28px] tracking-wide">VENUE</span>
           <span className="text-[13px] text-ink-soft font-medium">I book &amp; host gigs</span>

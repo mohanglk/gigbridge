@@ -23,7 +23,7 @@ export default function CtaFooter() {
               href="#"
               className="text-[14.5px] font-bold px-6 py-3 rounded-sm bg-transparent border-[1.5px] border-paper text-paper"
             >
-              I&apos;m a venue
+              I have a venue
             </a>
           </div>
         </div>
