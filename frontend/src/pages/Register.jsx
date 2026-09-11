@@ -1,7 +1,28 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
-import { api } from "../api/client";
+
+const INSTRUMENT_OPTIONS = [
+  "Vocalist / Singer",
+  "Guitar",
+  "Bass",
+  "Drums",
+  "Keyboard / Piano",
+  "Violin",
+  "Saxophone",
+  "DJ",
+  "Other",
+];
+
+const VENUE_TYPE_OPTIONS = [
+  "Bar / Pub",
+  "Nightclub",
+  "Restaurant",
+  "Banquet Hall",
+  "Cafe",
+  "Outdoor / Open Ground",
+  "Other",
+];
 
 export default function Register() {
   const navigate = useNavigate();
@@ -15,18 +36,19 @@ export default function Register() {
     identityName: "", // stage/band name (musician) or venue name (venue)
     email: "",
     phone: "",
-    city: "",
+    address: "",
+    instrument: INSTRUMENT_OPTIONS[0],
+    venueType: VENUE_TYPE_OPTIONS[0],
     password: "",
     confirmPassword: "",
   });
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
   function update(field) {
     return (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
   }
 
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
     setError("");
 
@@ -39,23 +61,26 @@ export default function Register() {
       return;
     }
 
-    setLoading(true);
-    try {
-      // Expects backend endpoint: POST /api/auth/register
-      // body includes accountType so the backend creates a Musician or Venue record
-      const data = await api("/api/auth/register", {
-        method: "POST",
-        body: JSON.stringify({ ...form, accountType }),
-      });
-      localStorage.setItem("gb_token", data.token);
-      // Send them straight into completing their profile (instruments/genres,
-      // or venue capacity/type) since we only collected the basics here.
-      navigate("/onboarding");
-    } catch (err) {
-      setError("Something went wrong creating your account. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    // NOTE: no backend auth endpoint exists yet, so for now we save the
+    // profile straight into localStorage. Swap this for a real
+    // POST /api/auth/register call once the backend is ready.
+    const profile = {
+      accountType,
+      name: form.name,
+      identityName: form.identityName,
+      email: form.email,
+      phone: form.phone,
+      address: form.address,
+      instrument: accountType === "musician" ? form.instrument : "",
+      venueType: accountType === "venue" ? form.venueType : "",
+      password: form.password, // demo only — never store plain-text passwords in production
+      rating: 0,
+      ratingCount: 0,
+    };
+
+    localStorage.setItem("gb_profile", JSON.stringify(profile));
+    localStorage.setItem("gb_logged_in", "true");
+    navigate("/profile");
   }
 
   return (
@@ -63,7 +88,6 @@ export default function Register() {
       title="CREATE ACCOUNT"
       subtitle="Join GigBridge as a musician or a venue."
     >
-      {/* account type toggle */}
       <div className="grid grid-cols-2 gap-2 mb-7">
         <button
           type="button"
@@ -116,6 +140,42 @@ export default function Register() {
           />
         </div>
 
+        {accountType === "musician" ? (
+          <div>
+            <label className="block text-[13px] font-semibold text-ink-soft mb-1.5">
+              Instrument / role
+            </label>
+            <select
+              value={form.instrument}
+              onChange={update("instrument")}
+              className="w-full border border-ink/25 rounded-sm px-3.5 py-2.5 text-[14.5px] bg-white focus:outline-none focus:border-orange-deep"
+            >
+              {INSTRUMENT_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : (
+          <div>
+            <label className="block text-[13px] font-semibold text-ink-soft mb-1.5">
+              Venue type
+            </label>
+            <select
+              value={form.venueType}
+              onChange={update("venueType")}
+              className="w-full border border-ink/25 rounded-sm px-3.5 py-2.5 text-[14.5px] bg-white focus:outline-none focus:border-orange-deep"
+            >
+              {VENUE_TYPE_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-[13px] font-semibold text-ink-soft mb-1.5">
@@ -147,14 +207,14 @@ export default function Register() {
 
         <div>
           <label className="block text-[13px] font-semibold text-ink-soft mb-1.5">
-            City
+            Address
           </label>
           <input
             required
-            value={form.city}
-            onChange={update("city")}
+            value={form.address}
+            onChange={update("address")}
             className="w-full border border-ink/25 rounded-sm px-3.5 py-2.5 text-[14.5px] bg-white focus:outline-none focus:border-orange-deep"
-            placeholder="e.g. Hyderabad"
+            placeholder="e.g. 12 Park Lane, Hyderabad"
           />
         </div>
 
@@ -191,10 +251,9 @@ export default function Register() {
 
         <button
           type="submit"
-          disabled={loading}
-          className="mt-2 bg-ink text-paper font-semibold text-[14.5px] py-3 rounded-sm disabled:opacity-60"
+          className="mt-2 bg-ink text-paper font-semibold text-[14.5px] py-3 rounded-sm"
         >
-          {loading ? "Creating account…" : "Create account"}
+          Create account
         </button>
       </form>
 

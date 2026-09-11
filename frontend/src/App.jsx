@@ -1,11 +1,20 @@
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { Routes, Route, Link, useLocation, useNavigate } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Waitlist from "./pages/Waitlist";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Profile from "./pages/Profile";
 
 function Nav() {
+  const navigate = useNavigate();
+  const loggedIn = localStorage.getItem("gb_logged_in") === "true";
+
+  function handleLogout() {
+    localStorage.removeItem("gb_logged_in");
+    navigate("/");
+  }
+
   return (
     <nav className="flex items-center justify-between px-8 py-6 max-w-[1160px] mx-auto">
       <Link to="/" className="font-display text-[26px] tracking-wide">
@@ -26,15 +35,31 @@ function Nav() {
         </a>
       </div>
       <div className="flex items-center gap-5">
-        <Link to="/login" className="text-sm font-semibold text-ink">
-          Log in
-        </Link>
-        <Link
-          to="/waitlist"
-          className="text-sm font-semibold bg-ink text-paper px-4.5 py-2 rounded-sm"
-        >
-          Join the waitlist
-        </Link>
+        {loggedIn ? (
+          <>
+            <Link to="/profile" className="text-sm font-semibold text-ink">
+              My profile
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="text-sm font-semibold bg-ink text-paper px-4.5 py-2 rounded-sm"
+            >
+              Log out
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" className="text-sm font-semibold text-ink">
+              Log in
+            </Link>
+            <Link
+              to="/waitlist"
+              className="text-sm font-semibold bg-ink text-paper px-4.5 py-2 rounded-sm"
+            >
+              Join the waitlist
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   );
@@ -55,6 +80,7 @@ export default function App() {
         <Route path="/waitlist" element={<Waitlist />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </div>
   );

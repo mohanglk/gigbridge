@@ -1,34 +1,36 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
-import { api } from "../api/client";
 
 export default function Login() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
   function update(field) {
     return (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
   }
 
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
     setError("");
-    setLoading(true);
-    try {
-      // Expects backend endpoint: POST /api/auth/login -> { token, user }
-      const data = await api("/api/auth/login", {
-        method: "POST",
-        body: JSON.stringify(form),
-      });
-      localStorage.setItem("gb_token", data.token);
-      navigate("/dashboard");
-    } catch (err) {
+
+    // NOTE: no backend auth endpoint exists yet, so for now we check
+    // against the profile saved in localStorage during registration.
+    // Swap this for a real POST /api/auth/login call once the backend
+    // is ready.
+    const stored = localStorage.getItem("gb_profile");
+    if (!stored) {
+      setError("No account found. Please register first.");
+      return;
+    }
+
+    const profile = JSON.parse(stored);
+    if (profile.email === form.email && profile.password === form.password) {
+      localStorage.setItem("gb_logged_in", "true");
+      navigate("/profile");
+    } else {
       setError("Invalid email or password. Please try again.");
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -67,10 +69,9 @@ export default function Login() {
 
         <button
           type="submit"
-          disabled={loading}
-          className="mt-2 bg-ink text-paper font-semibold text-[14.5px] py-3 rounded-sm disabled:opacity-60"
+          className="mt-2 bg-ink text-paper font-semibold text-[14.5px] py-3 rounded-sm"
         >
-          {loading ? "Logging in…" : "Log in"}
+          Log in
         </button>
       </form>
 
