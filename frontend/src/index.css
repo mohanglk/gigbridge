@@ -1,3 +1,34 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  font-family: "Space Grotesk", sans-serif;
+}
+
+/* subtle paper texture, used behind the whole landing page */
+.paper-texture {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(32, 28, 22, 0.025) 0px,
+    rgba(32, 28, 22, 0.025) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* jagged "torn poster" seam down the middle of the hero split */
+.torn-seam {
+  clip-path: polygon(
+    50% 0%, 60% 4%, 45% 9%, 58% 14%, 42% 19%, 60% 24%,
+    45% 29%, 55% 34%, 40% 39%, 58% 44%, 48% 49%, 60% 54%,
+    42% 59%, 55% 64%, 45% 69%, 58% 74%, 40% 79%, 55% 84%,
+    48% 89%, 60% 94%, 50% 100%,
+    40% 100%, 52% 94%, 38% 89%, 55% 84%, 42% 79%, 60% 74%,
+    45% 69%, 58% 64%, 40% 59%, 58% 54%, 45% 49%, 60% 44%,
+    42% 39%, 58% 34%, 43% 29%, 60% 24%, 40% 19%, 55% 14%,
+    40% 9%, 52% 4%
+  );
+}
