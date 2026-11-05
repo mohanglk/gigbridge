@@ -34,14 +34,15 @@ React (Vite) SPA  ->  FastAPI modular monolith  ->  PostgreSQL / Redis / S3
 ## Local development
 
 ```bash
-# 1. Start Postgres + Redis
+# 1. Configure local environment and start Postgres + Redis
+cp backend/.env.example backend/.env
+# Set POSTGRES_PASSWORD in backend/.env to a local secret before startup.
 docker compose up -d db redis
 
 # 2. Backend
 cd backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env
 uvicorn app.main:app --reload
 
 # 3. Frontend (separate terminal)
@@ -51,6 +52,10 @@ npm run dev
 ```
 
 API docs are auto-generated at http://localhost:8000/docs
+
+The Compose backend uses the `db` service hostname for PostgreSQL and waits for
+the database health check. Running the backend directly on the host uses
+`localhost` from `backend/.env.example`.
 
 ## Roadmap
 
