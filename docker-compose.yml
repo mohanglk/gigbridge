@@ -1,12 +1,15 @@
 services:
   db:
     image: postgres:16
-    environment:
-      POSTGRES_USER: gigbridge
-      POSTGRES_PASSWORD: gigbridge
-      POSTGRES_DB: gigbridge
+    env_file: ./backend/.env
     ports: ["5432:5432"]
     volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   redis:
     image: redis:7
@@ -15,8 +18,15 @@ services:
   backend:
     build: ./backend
     env_file: ./backend/.env
+    environment:
+      DATABASE_HOST: db
+      REDIS_URL: redis://redis:6379/0
     ports: ["8000:8000"]
-    depends_on: [db, redis]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
 volumes:
   pgdata:
