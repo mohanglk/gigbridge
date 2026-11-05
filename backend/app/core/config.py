@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from typing import Literal
+
 from pydantic import AliasChoices, Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import URL
@@ -31,8 +33,10 @@ class Settings(BaseSettings):
 
     redis_url: str = "redis://localhost:6379/0"
     jwt_secret: SecretStr | None = None
-    jwt_algorithm: str = "HS256"
-    access_token_expire_minutes: int = 60
+    jwt_algorithm: Literal["HS256"] = "HS256"
+    jwt_issuer: str = "gigbridge-api"
+    jwt_audience: str = "gigbridge-clients"
+    access_token_expire_minutes: int = Field(default=15, gt=0, le=60)
     aws_s3_bucket: str = "gigbridge-media"
     aws_region: str = "ap-south-1"
 
