@@ -8,6 +8,22 @@ on:
 jobs:
   backend:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: gigbridge_test
+          POSTGRES_PASSWORD: gigbridge_test
+          POSTGRES_DB: gigbridge_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U gigbridge_test -d gigbridge_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      GIGBRIDGE_TEST_DATABASE_URL: postgresql+psycopg://gigbridge_test:gigbridge_test@localhost:5432/gigbridge_test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -15,6 +31,7 @@ jobs:
           python-version: "3.12"
       - run: pip install -r backend/requirements.txt
       - run: python -c "import compileall, sys; sys.exit(0 if compileall.compile_dir('backend/app', quiet=1) else 1)"
+      - run: cd backend && python -m unittest discover -s tests -v
 
   frontend:
     runs-on: ubuntu-latest
