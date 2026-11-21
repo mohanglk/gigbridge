@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.core.config import settings
+from app.modules.auth.router import router as auth_router
 from app.modules.profiles.router import router as profiles_router
 from app.modules.bands.router import router as bands_router
 from app.modules.gigs.router import router as gigs_router
@@ -12,7 +14,7 @@ app = FastAPI(title="GigBridge API", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=settings.cors_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -24,6 +26,7 @@ app.include_router(gigs_router, prefix="/api/gigs", tags=["gigs"])
 app.include_router(bookings_router, prefix="/api/bookings", tags=["bookings"])
 app.include_router(chat_router, prefix="/api/chat", tags=["chat"])
 app.include_router(matching_router, prefix="/api/matching", tags=["matching"])
+app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
 
 
 @app.get("/health")
